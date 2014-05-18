@@ -92,7 +92,6 @@ module MoSQL
       unless options[:skip_tail]
         start_ts = @mongo['local']['oplog.rs'].find_one({}, {:sort => [['$natural', -1]]})['ts']
       end
-
       @mongo.database_names.each do |dbname|
         next unless spec = @schema.find_db(dbname)
         log.info("Importing for Mongo DB #{dbname}...")

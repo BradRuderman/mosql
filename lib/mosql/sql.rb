@@ -70,4 +70,3 @@ module MoSQL
     end
   end
 end
-

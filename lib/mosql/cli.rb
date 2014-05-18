@@ -94,6 +94,10 @@ module MoSQL
         opts.on("--unsafe", "Ignore rows that cause errors on insert") do
           @options[:unsafe] = true
         end
+
+        opts.on("--be-smart", "Don't use the metadata provided, learn table schema based on the json objects and adjust as neccessary") do
+          @options[:smart] = true
+        end
       end
 
       optparse.parse!(@args)
@@ -130,7 +134,11 @@ module MoSQL
     def load_collections
       collections = YAML.load_file(@options[:collections])
       begin
-        @schema = MoSQL::Schema.new(collections)
+        if @options[:smart]
+          @schema = MoSQL::SmartSchema.new(collections, @mongo)
+        else
+          @schema = MoSQL::Schema.new(collections)
+        end
       rescue MoSQL::SchemaError => e
         log.error("Error parsing collection map `#{@options[:collections]}':")
         log.error(e.to_s)
@@ -140,9 +148,10 @@ module MoSQL
 
     def run
       parse_args
+      connect_mongo
       load_collections
       connect_sql
-      connect_mongo
+
 
       metadata_table = MoSQL::Tailer.create_table(@sql.db, 'mosql_tailers')
 

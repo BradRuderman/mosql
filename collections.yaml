@@ -1,0 +1,5 @@
+mydb:
+  testData:
+    :meta:
+     :table: things
+     :extra_props: true

@@ -1,0 +1,9 @@
+mydb:
+  testData:
+    :columns:
+      - _id: TEXT
+      - x: INTEGER
+      - j: INTEGER
+    :meta:
+     :table: things
+     :extra_props: true
