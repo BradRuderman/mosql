@@ -124,7 +124,7 @@ module MoSQL
     end
 
     def connect_sql
-      @sql = MoSQL::SQLAdapter.new(@schema, options[:sql], options[:schema])
+      @sql = MoSQL::SQLAdapter.new(@schema, options[:sql], options[:schema], options[:smart])
       if options[:verbose] >= 2
         @sql.db.sql_log_level = :debug
         @sql.db.loggers << Logger.new($stderr)

@@ -6,4 +6,4 @@ mydb:
       - j: INTEGER
     :meta:
      :table: things
-     :extra_props: true
+     :extra_props: false

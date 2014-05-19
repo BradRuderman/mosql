@@ -123,7 +123,11 @@ module MoSQL
       collection.find(nil, :batch_size => BATCH) do |cursor|
         with_retries do
           cursor.each do |obj|
-            batch << @schema.transform(ns, obj)
+            if @options[:smart]
+              batch << @schema.transform(ns, obj, @sql.db)
+            else
+              batch << @schema.transform(ns, obj)
+            end
             count += 1
 
             if batch.length >= BATCH

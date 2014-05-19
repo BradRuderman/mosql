@@ -4,8 +4,9 @@ module MoSQL
 
     attr_reader :db
 
-    def initialize(schema, uri, pgschema=nil)
+    def initialize(schema, uri, pgschema=nil, smart=nil)
       @schema = schema
+      @smart = smart
       connect_db(uri, pgschema)
     end
 
@@ -28,13 +29,19 @@ module MoSQL
     def transform_one_ns(ns, obj)
       h = {}
       cols = @schema.all_columns(@schema.find_ns(ns))
-      row  = @schema.transform(ns, obj)
+      if @smart
+        row  = @schema.transform(ns, obj, @db)
+      else
+        print("Not smart")
+        row  = @schema.transform(ns, obj)
+      end
       cols.zip(row).each { |k,v| h[k] = v }
       h
     end
 
     def upsert_ns(ns, obj)
       h = transform_one_ns(ns, obj)
+      puts(h)
       upsert!(table_for_ns(ns), @schema.primary_sql_key_for_ns(ns), h)
     end
 
@@ -47,6 +54,7 @@ module MoSQL
     end
 
     def upsert!(table, table_primary_key, item)
+      puts(item)
       rows = table.where(table_primary_key.to_sym => item[table_primary_key]).update(item)
       if rows == 0
         begin
