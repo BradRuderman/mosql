@@ -27,7 +27,7 @@ module MoSQL
 
     def self.recurse_obj(k,v,cols = [])
       v.each do |k1, v1|
-        name = k + "_" + k1
+        name = k + "." + k1
         source = k + "." + k1
         if v1.is_a?(Hash)
           self.recurse_obj(name,v1,cols)

@@ -28,20 +28,18 @@ module MoSQL
 
     def transform_one_ns(ns, obj)
       h = {}
-      cols = @schema.all_columns(@schema.find_ns(ns))
       if @smart
         row  = @schema.transform(ns, obj, @db)
       else
-        print("Not smart")
         row  = @schema.transform(ns, obj)
       end
+      cols = @schema.all_columns(@schema.find_ns(ns))
       cols.zip(row).each { |k,v| h[k] = v }
       h
     end
 
     def upsert_ns(ns, obj)
       h = transform_one_ns(ns, obj)
-      puts(h)
       upsert!(table_for_ns(ns), @schema.primary_sql_key_for_ns(ns), h)
     end
 
@@ -54,7 +52,6 @@ module MoSQL
     end
 
     def upsert!(table, table_primary_key, item)
-      puts(item)
       rows = table.where(table_primary_key.to_sym => item[table_primary_key]).update(item)
       if rows == 0
         begin
@@ -76,5 +73,6 @@ module MoSQL
       # how to get at this error code....
       e.wrapped_exception.result.error_field(PG::Result::PG_DIAG_SQLSTATE) == "23505"
     end
+    
   end
 end

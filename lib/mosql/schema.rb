@@ -69,7 +69,6 @@ module MoSQL
     end
 
     def create_schema(db, clobber=false)
-      puts(@map)
       @map.values.each do |dbspec|
         dbspec.each do |n, collection|
           next unless n.is_a?(String)
