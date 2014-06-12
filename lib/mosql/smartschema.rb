@@ -34,29 +34,20 @@ module MoSQL
         if v1.is_a?(Hash)
           self.recurse_obj(name,v1,cols)
         else
-          if v1.is_a?(Array) and @extract.include?(name)
-            cols << { :source => source, :name => name, :type => "EXTRACT" }
-          else
-            cols << { :source => source, :name => name, :type => self.get_type(v1) }
-          end
+          cols << { :source => source, :name => name, :type => self.get_type(v1) }
         end
       end
       return cols
     end
 
-    def get_columns(obj,map,extract)
+    def get_columns(obj,map)
       cols = []
-      @extract = extract
       obj.each do |k,v|
         if not map.has_key?(k)
-          if v.is_a?(Array) and extract.include?(k)
-            cols << { :source => k, :name => k, :type => "EXTRACT" }
+          if v.is_a?(Hash)
+            cols = cols + self.recurse_obj(k,v)
           else
-            if v.is_a?(Hash)
-              cols = cols + self.recurse_obj(k,v)
-            else
-              cols << { :source => k, :name => k, :type => self.get_type(v) }
-            end
+            cols << { :source => k, :name => k, :type => self.get_type(v) }
           end
         else
           if map[k].has_key?(:source)
@@ -98,9 +89,7 @@ module MoSQL
       log.info("Adding column(s) to table #{schema}: #{alterations}")
       db.send(:alter_table, schema) do
         alterations.each do |new_column|
-          if new_column[:type] != "EXTRACT"
-            add_column new_column[:name], new_column[:type]
-          end
+          add_column new_column[:name], new_column[:type]
         end
       end
     end
@@ -113,7 +102,7 @@ module MoSQL
 
       row = transform_row(obj,schema)
       if obj.keys.length > 0
-        new_columns = get_columns(obj, @map_original[dbname][cname][:columns], @map_original[dbname][cname][:extract])
+        new_columns = get_columns(obj, @map_original[dbname][cname][:columns])
         @map[dbname][cname][:columns] = @map[dbname][cname][:columns] + new_columns
         row = row + transform_row(obj, {:columns => new_columns })
         alter_schema(schema[:meta][:table], new_columns, db)
@@ -133,10 +122,10 @@ module MoSQL
         map.each do |dbname, db|
             @map[dbname] = { :meta => parse_meta(db[:meta]) }
             db.each do |cname, spec|
-                @map[dbname][cname] = {:columns => [], :meta => parse_meta(spec[:meta]), :extract => spec[:extract]}
+                @map[dbname][cname] = {:columns => [], :meta => parse_meta(spec[:meta])}
                 first_item = mongo[dbname][cname].find_one()
                 if first_item
-                    @map[dbname][cname][:columns] = get_columns(first_item, map[dbname][cname][:columns], map[dbname][cname][:extract])
+                    @map[dbname][cname][:columns] = get_columns(first_item, map[dbname][cname][:columns])
                 end
             end
         end
