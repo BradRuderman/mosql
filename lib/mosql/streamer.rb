@@ -128,6 +128,7 @@ module MoSQL
             else
               batch << @schema.transform(ns, obj)
             end
+
             count += 1
 
             if batch.length >= BATCH

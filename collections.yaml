@@ -1,5 +1,12 @@
-mydb:
-  testData:
+upcounsel:
+  users:
+    :columns:
+      ServicesRate:
+        :source: ServicesRate
+        :type: TEXT
+    :extract:
+      - BarCerts
+      - b.a.BarCerts
     :meta:
-     :table: things
-     :extra_props: false
+     :table: users
+     :extra_props: true

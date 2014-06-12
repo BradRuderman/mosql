@@ -109,12 +109,6 @@ module MoSQL
       else
         log.level = Log4r::INFO
       end
-'''
-      unless @options[:reimport]
-        log.error("Cannot be-smart without reimporting. The process needs to learn the schema from mongo. If the process learns the already existing schema from sql, there is no guarantee it will map it correctly to the mongo fields.")
-        exit(1)
-      end
-'''
     end
 
     def connect_mongo
@@ -139,9 +133,10 @@ module MoSQL
 
     def load_collections
       collections = YAML.load_file(@options[:collections])
+      log.debug(collections)
       begin
         if @options[:smart]
-          @schema = MoSQL::SmartSchema.new(collections, @mongo)
+          @schema = MoSQL::SmartSchema.new(collections, @mongo, options[:reimport])
         else
           @schema = MoSQL::Schema.new(collections)
         end

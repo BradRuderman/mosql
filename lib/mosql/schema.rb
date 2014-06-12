@@ -80,7 +80,9 @@ module MoSQL
               if col[:source] == '$timestamp'
                 opts[:default] = Sequel.function(:now)
               end
-              column col[:name], col[:type], opts
+              if col[:type] != "EXTRACT"
+                column col[:name], col[:type], opts
+              end
 
               if col[:source].to_sym == :_id
                 primary_key [col[:name].to_sym]

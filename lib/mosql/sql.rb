@@ -4,7 +4,7 @@ module MoSQL
 
     attr_reader :db
 
-    def initialize(schema, uri, pgschema=nil, smart=nil)
+    def initialize(schema, uri, pgschema=nil, smart=nil, learn=nil)
       @schema = schema
       @smart = smart
       connect_db(uri, pgschema)
@@ -73,6 +73,6 @@ module MoSQL
       # how to get at this error code....
       e.wrapped_exception.result.error_field(PG::Result::PG_DIAG_SQLSTATE) == "23505"
     end
-    
+
   end
 end
