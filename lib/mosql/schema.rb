@@ -83,7 +83,6 @@ module MoSQL
               if col[:type] != "EXTRACT"
                 column col[:name], col[:type], opts
               end
-
               if col[:source].to_sym == :_id
                 primary_key [col[:name].to_sym]
               end
@@ -218,7 +217,9 @@ module MoSQL
     def all_columns(schema, copy=false)
       cols = []
       schema[:columns].each do |col|
-        cols << col[:name] unless copy && !copy_column?(col)
+        unless col[:type] == "EXTRACT" 
+          cols << col[:name] unless copy && !copy_column?(col)
+        end
       end
       if schema[:meta][:extra_props]
         cols << "_extra_props"

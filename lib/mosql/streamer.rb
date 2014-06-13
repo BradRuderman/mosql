@@ -88,7 +88,9 @@ module MoSQL
 
     def initial_import
       @schema.create_schema(@sql.db, !options[:no_drop_tables])
-
+      if @schema.class.name == "MoSQL::SmartSchema"
+        @schema.drop_extracts(@sql.db)
+      end
       unless options[:skip_tail]
         start_ts = @mongo['local']['oplog.rs'].find_one({}, {:sort => [['$natural', -1]]})['ts']
       end
