@@ -224,12 +224,21 @@ module MoSQL
         map.each do |dbname, db|
             @map[dbname] = { :meta => parse_meta(db[:meta]) }
             db.each do |cname, spec|
-                @cname = cname
-                @map[dbname][cname] = {:columns => [], :meta => parse_meta(spec[:meta]), :extract => parse_extract(spec[:extract])}
-                first_item = mongo[dbname][cname].find_one()
-                if first_item
-                  @map[dbname][cname][:columns] = get_columns(first_item, map[dbname][cname][:columns], @map[dbname][cname][:extract])
+              @cname = cname
+              @map[dbname][cname] = {:columns => [], :meta => parse_meta(spec[:meta]), :extract => parse_extract(spec[:extract])}
+              if @map[dbname][cname][:extract].size() > 0
+                checks = []
+                @map[dbname][cname][:extract].each do |x|
+                  a = {x => { "$exists" => true}, "$where" => "this.#{x}.length>1"}
+                  checks << a
                 end
+                first_item = mongo[dbname][cname].find_one( "$and" => checks )
+              else
+                first_item = mongo[dbname][cname].find_one()
+              end
+              if first_item
+                @map[dbname][cname][:columns] = get_columns(first_item, map[dbname][cname][:columns], @map[dbname][cname][:extract])
+              end
             end
         end
       end
