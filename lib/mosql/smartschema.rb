@@ -7,7 +7,7 @@ module MoSQL
     def get_type(col)
       case col
         when BSON::ObjectId
-          "CHAR(36)"
+          "CHAR(24)"
         when String, NilClass
           "TEXT"
         when Integer, Fixnum
@@ -91,13 +91,20 @@ module MoSQL
       obj[col[:source]].each do |o|
         row = [pid]
         col[:schema].each do |c|
-          if o.has_key?(c[:source])
-            v = o[c[:source]]
+          if o.has_key?(c[:source].split(".")[0])
+            source = c[:source].split(".")
+            v=o
+            while source.size() > 0
+              v = v[source[0]]
+              source.delete(source[0])
+            end
             case v
               when BSON::Binary, BSON::ObjectId, Symbol
                 v = v.to_s
               when Hash, Array
                 v = JSON.dump(v)
+              when nil
+                v = nil
               else
                 v = v.to_s
             end
