@@ -98,6 +98,9 @@ module MoSQL
               v = v[source[0]]
               source.delete(source[0])
             end
+            if c[:type] == "INTEGER"
+              v = v.to_i
+            end
             case v
               when BSON::Binary, BSON::ObjectId, Symbol
                 v = v.to_s
