@@ -123,7 +123,7 @@ module MoSQL
 
     def create_extract_table(col, db)
       db.send(:create_table?, col[:name]) do
-        column "pid", "CHAR(36)"
+        column "pid", "CHAR(24)"
         col[:schema].each do |col|
           if col[:type] != "EXTRACT"
             column col[:name], col[:type]
