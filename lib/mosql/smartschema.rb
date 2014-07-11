@@ -239,10 +239,10 @@ module MoSQL
               if @map[dbname][cname][:extract].size() > 0
                 checks = []
                 @map[dbname][cname][:extract].each do |x|
-                  a = {x => { "$exists" => true}, "$where" => "this.#{x}.length>0"}
+                  a = {x => { "$exists" => true}, "$where" => "this.#{x}.length>1"}
                   checks << a
                 end
-                first_item = mongo[dbname][cname].find( "$and" => checks ).sort(:_id => -1 ).limit(1).to_a[0]
+                first_item = mongo[dbname][cname].find_one( "$and" => checks )
               else
                 first_item = mongo[dbname][cname].find_one()
               end
