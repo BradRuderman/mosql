@@ -242,7 +242,7 @@ module MoSQL
                   a = {x => { "$exists" => true}, "$where" => "this.#{x}.length>1"}
                   checks << a
                 end
-                first_item = mongo[dbname][cname].find_one( "$and" => checks )
+                first_item = mongo[dbname][cname].find( "$and" => checks ).sort(:_id => -1).limit(1).to_a[0]
               else
                 first_item = mongo[dbname][cname].find_one()
               end
