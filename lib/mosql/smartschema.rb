@@ -95,8 +95,11 @@ module MoSQL
             source = c[:source].split(".")
             v=o
             while source.size() > 0
-              v = v[source[0]]
-              source.delete(source[0])
+              begin
+                v = v[source[0]]
+                source.delete(source[0])
+              rescue
+              end
             end
             if c[:type] == "INTEGER"
               v = v.to_i
