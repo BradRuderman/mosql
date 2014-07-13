@@ -99,6 +99,7 @@ module MoSQL
                 v = v[source[0]]
                 source.delete(source[0])
               rescue
+                source = []
               end
             end
             if c[:type] == "INTEGER"
